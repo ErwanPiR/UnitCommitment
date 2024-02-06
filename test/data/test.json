@@ -1,0 +1,12 @@
+{ 
+	"max_pump_capacity" : 5.0,
+	"max_turbine_capacity" : 5.0,
+	"eff_pump" : 0.3,
+	"eff_turbine" : 0.75,
+	"x_init" : 100.0,
+	"x_min" : 60.0,
+	"x_max" : 100.0,
+	"x_end" : 10.0,
+	"prices" : [41.32, 74.21, 8.97, 50.54, 30.67, 10.0, 15.0, 67.0, 80.0, 85.0],
+	"inflows" : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+}
