@@ -57,6 +57,7 @@ function optim_pump_storage(prods, price, u_turbine, u_pump, q, eff_pump, x_max,
 
     x_min = 0 # Minimum capacity of the reservoir
     eff_turbine = 1. # Turbine efficiency
+    eff_pump = 1. # Pumping efficiency
     n_grid = 100 # Number of grid points
     x = (x_min : (x_min + (x_max-x_min)/(n_grid-1)): x_max) # Grid points
     T = length(price)
