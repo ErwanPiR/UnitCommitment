@@ -19,6 +19,10 @@ function optim_pump_storage_jump(prods, price, u_turbine, u_pump, q, eff_pump, x
         @constraint(m,  x_init + sum(q[1:i] .- turbine[1:i] .+ pump[1:i]) >= 0)
     end
 
+    @constraint(m,  x_init + sum(q[1:n] .- turbine[1:n] .+ pump[1:n]) == x_end)
+
+    ## Ne connait pas la contrainte que sur un timestep, capa de pompage / turbinage = capa max de la pompe / turbine
+
     @objective(m, Max, sum(price .* turbine .- price .* pump .* eff_pump) )
 
     optimize!(m)

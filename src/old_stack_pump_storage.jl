@@ -1,24 +1,15 @@
 
-function old_optim_pump_storage(prods, price, capa_turb, capa_pump, inflow, eff_pump, volume_max, volume_init, volume_end)
+function old_optim_pump_storage(prods, price, capa_turb, capa_pump, inflow, eff_pump, volume_max, volume_init, volume_end, n_grid)
 
 
-    eff_pump = 1.0
+    # eff_pump = 1.0
     
     T = size(price, 1)
 
     # parameters
     volume_min = 0
-    n_grid = 100
-    #inflow = zeros(T)
+    # n_grid = 10
 
-    ### QUESTION 
-    # pourquoi capa_in & capa_out normalisés dans g_in et h_out alors que deja normalisé dans le calcul
-    # Idem inflow 
-    # erreur calcul capa_out ? 
-    # pourquoi divisé par eff_pump ? 
-    # calcul des poids pour l'interpolation linéaire 
-    # ind_pump = (prods[splant] .< 0);  prods[splant][ind_pump] .= prods[splant][ind_pump] ./ eff_pump : ???
-  
     # grid
     grid = collect(1:n_grid)
     grid_step = Float64(floor(volume_max/(n_grid-1); digits = 5))

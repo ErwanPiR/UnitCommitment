@@ -1,17 +1,13 @@
 using Pkg
 Pkg.activate(joinpath(@__DIR__, ".."))
 using UnitCommitment
-
 Pkg.activate(joinpath(@__DIR__, "."))
-
 using Plots, JSON
 
-data = JSON.parsefile(joinpath(@__DIR__, "..", "test", "data", "test.json"))
+data = JSON.parsefile(joinpath(@__DIR__, "..", "test", "data", "test1.json"))
+# data = JSON.parsefile(joinpath(@__DIR__, "", "test", "data", "test2.json"))
 
 T 			= length(data["prices"])
-prods 		= Array{Float64}(undef, T)
-prods2 		= Array{Float64}(undef, T)
-prods3 		= Array{Float64}(undef, T)
 prices 		= Float64.(data["prices"])
 u_turbine 	= ones(T) * data["max_turbine_capacity"]
 u_pump		= ones(T) * data["max_pump_capacity"]
@@ -21,40 +17,32 @@ x_max 		= data["x_max"]
 x_init		= data["x_init"]
 x_end		= data["x_end"]
 
+n_grid = 100
 
-prods = UnitCommitment.optim_pump_storage(prods, prices, u_turbine, u_pump, q, eff_pump, x_max, x_init, x_end)
+prods_new 		= Array{Float64}(undef, T)
+prods_jump 		= Array{Float64}(undef, T)
+prods_old 		= Array{Float64}(undef, T)
 
-prods2 = Array{Float64}(undef, T)
-prods2 = UnitCommitment.optim_pump_storage_jump(prods2, prices, u_turbine, u_pump, q, eff_pump, x_max, x_init, x_end)
-
-prods3 = UnitCommitment.old_optim_pump_storage(prods3, prices, u_turbine, u_pump, q, eff_pump, x_max, x_init, x_end)
-
-
-stock = x_init .- cumsum(q .- prods)
-stock2 = x_init .+ cumsum(q .- prods2)
-stock3 = x_init .+ cumsum(q .- prods3)
-
-p1 = plot(prods, label="Production", legend=:topleft)
-p1 = plot!(twinx(), prices, label="Price", color=:red)
-
-p2 = plot(stock, label="Stock")
-p2 = plot!(repeat([x_max], size(stock,1)), label="max")
-
-p3 = plot(prods2, label="Production", legend=:topleft)
-p3 = plot!(twinx(), prices, label="Price", color=:red)
-
-p4 = plot(stock2, label="Stock")
-p4 = plot!(repeat([x_max], size(stock2,1)), label="max")
+@info ">>> NEW"
+prods_new = UnitCommitment.optim_pump_storage(prods_new, prices, u_turbine, u_pump, q, eff_pump, x_max, x_init, x_end, n_grid)
+@info ">>> JUMP"
+prods_jump = UnitCommitment.optim_pump_storage_jump(prods_jump, prices, u_turbine, u_pump, q, eff_pump, x_max, x_init, x_end)
+@info ">>> OLD"
+prods_old = UnitCommitment.old_optim_pump_storage(prods_old, prices, u_turbine, u_pump, q, eff_pump, x_max, x_init, x_end, n_grid)
 
 
-p5 = plot(prods3, label="Production", legend=:topleft)
-p5 = plot!(twinx(), prices, label="Price", color=:red)
+stock_new = x_init .+ cumsum(q .- prods_new)
+stock_jump = x_init .+ cumsum(q .- prods_jump)
+stock_old = x_init .+ cumsum(q .- prods_old)
 
-p6 = plot(stock3, label="Stock")
-p6 = plot!(repeat([x_max], size(stock3,1)), label="max")
+p1 = plot(prods_new, label="new", color = :blue, legend=:top);
+p1 = plot!(prods_jump, label="jump", color=:green);
+p1 = plot!(prods_old, label="old", color=:orange);
+p1 = plot!(twinx(), prices, label="price", color=:red, legend=false);
 
+p2 = plot(stock_new, label="new",color = :blue);
+p2 = plot!(stock_jump, label="jump",color=:green);
+p2 = plot!(stock_old, label="old",color=:orange);
+p2 = hline!([x_max], label="max", color=:red);
 
-#plot(p1, p2, layout=(2,1), size = (800,600))
-
-#plot(p1, p2, p3, p4, layout=(4,1), size = (800,800))
-plot(p1, p2, p5, p6, layout=(4,1), size = (800,800))
+plot(p1, p2, layout=(2,1), size = (800,800))
